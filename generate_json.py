@@ -6,14 +6,25 @@ from urllib.parse import quote
 import re
 import json
 
+
 def regexReplace(string, search, replacement):
     return re.compile(search).sub(replacement, string)
 
-json_data = {}
 
+def shorten_string(input_string):
+    if len(input_string) <= 100:
+        return input_string
+    else:
+        return input_string[:97] + '...'
+
+
+# determine whether to truncate
+DO_TRUNCATE = True
+
+json_data = {}
 languageCount = 0
 languagesText = ""
-content=""
+content = ""
 
 # List the available languages
 for directory in sorted(os.listdir('.')):
@@ -23,15 +34,15 @@ for directory in sorted(os.listdir('.')):
             if os.path.isfile(os.path.join(directory, filename)):
                 language = (os.path.splitext(filename)[0].replace(
                     "-", "-").replace("∕", "/").replace("＼", "\\").replace(
-                        "˸", ":").replace("∗", "*").replace("？", "?").replace(
-                            "＂",
-                            "\"").replace("﹤",
-                                          "<").replace("﹥",
-                                                       ">").replace("❘", "|"))
+                    "˸", ":").replace("∗", "*").replace("？", "?").replace(
+                    "＂",
+                    "\"").replace("﹤",
+                                  "<").replace("﹥",
+                                               ">").replace("❘", "|"))
                 languagesText += f'* [{language}]({posixpath.join(quote(directory), quote(filename))})\n'
                 languageCount += 1
 
-                json_data[languageCount]={}
+                json_data[languageCount] = {}
                 json_data[languageCount]['language'] = language
                 json_data[languageCount]['path'] = f'{posixpath.join(quote(directory), quote(filename))}'
 
@@ -40,7 +51,7 @@ for directory in sorted(os.listdir('.')):
                         content = file.read()
                     except UnicodeDecodeError:
                         content = file.read().decode('latin-1')
-                    json_data[languageCount]['content'] = content
+                    json_data[languageCount]['content'] = shorten_string(content) if DO_TRUNCATE else content
 
 file_path = 'data.json'
 with open(file_path, 'w') as json_file:

@@ -53,6 +53,8 @@ for directory in sorted(os.listdir('.')):
                         content = file.read().decode('latin-1')
                     json_data[languageCount]['content'] = shorten_string(content) if DO_TRUNCATE else content
 
+# language amount
+json_data['total'] = languageCount
 file_path = 'data.json'
 with open(file_path, 'w') as json_file:
     json.dump(json_data, json_file, indent=4)
